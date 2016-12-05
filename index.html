@@ -1,0 +1,314 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>MEDLINE by Year</title>
+  <link href="custom.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script>
+  </script>
+</head>
+
+<!--
+Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
+-->
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<div class="container">
+
+<div id="topbanner" class="jumbotron">
+  <h1>MEDLINE by Year</h1>
+  <a id="about" class="label label-default" href="about.html">About MEDLINE by Year</a>
+</div>
+
+<div class="row">
+
+
+
+<div id="left" class="col-sm-12 col-md-12 col-lg-12">
+
+<div id="search" class="input-group input-group-lg">
+  <input type="text" id="pmsearch" class="form-control">
+  <span class="input-group-btn">
+    <button id="runsearch" class="btn btn-default" type="button">Search</button>
+  </span>
+
+</div>
+
+<div id="printable">
+  <div id="printable-stuff">
+  <span class="close">×</span>
+  </div>
+</div>
+
+<div id="results">
+<div id="chart_div">
+  <div id="splash">
+    <p>MEDLINE by Year shows how your MEDLINE search compares to the database as whole...
+      <em><a href="about.html">(more)</a></em></p>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="col-sm-12 col-md-2 col-lg-3">
+
+<div id="past" class="panel panel-default hideme">
+  <div class="panel-heading">
+    <h3 class="panel-title">Past searches</h3>
+  </div>
+  <div class="panel-body">
+  </div>
+</div>
+<p style='clear: both; margin-bottom: 60px;'></p>
+<br />
+
+</div>
+
+
+</div>
+</div>
+
+
+<footer class="footer">
+  <div class="container">
+    <span class="text-muted">  <p>Design and contruction by Ed Sperr, M.L.I.S. (<a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a>)   |
+      Data from <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>  |   Charting tools from  <a href="https://developers.google.com/chart/interactive/docs/gallery/geochart" target="_blank">Google</a>
+     | See the code at <a href="https://github.com/esperr/mapping-medline">GitHub</a></p></span>
+  </div>
+</footer>
+
+
+<script>
+
+(function() {
+
+var searches = { counts:{}, searchterms:[] };
+var basecounts = {};
+var d = new Date();
+var thisYear = d.getFullYear();
+
+$.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
+  //build out our data structure
+  var allCounts = data.counts;
+  for (var year in allCounts) {
+    searches.counts[year] = { "total": allCounts[year] } ;
+  }
+});
+
+//var search = [];
+google.charts.load('current', {'packages':['line']});
+//google.charts.load('current', {packages: ['corechart', 'line']});
+
+
+var currentwidth = $("#left").innerWidth() * .9;
+var mywidth = 600;
+var myheight = 300;
+if (currentwidth > mywidth) {
+  mywidth = currentwidth;
+  myheight = currentwidth*.5;
+}
+
+//manually get baseline counts
+//term = "all[sb]";
+//dosearch(term);
+//alert("done!");
+
+function handlesearch() {
+  term = $("#pmsearch").val();
+  dosearch(term);
+  $("#pmsearch").val("");
+  document.getElementById('pmsearch').focus();
+  }
+
+function showWait() {
+  $( "#pmsearch" ).prop( "disabled", true );
+  $( "#runsearch" ).prop( "disabled", true );
+  $( "form" ).addClass( "hideme" );
+  $("#results").empty();
+  $( "#results" ).append("<div id='loading'><p class='text-center'>Grabbing your results &mdash; please wait</p></div>")
+  $( "#results p" ).append( '<br /><img src="loading-bars.svg">' );
+  }
+
+  function showDone() {
+    $( "#pmsearch" ).prop( "disabled", false );
+    $( "#runsearch" ).prop( "disabled", false );
+    $( "form" ).removeClass( "hideme" );
+    $( "#runsearch" ).removeClass( "hideme" );
+    $("#loading").remove();
+    $("#fetchresults").remove();
+    }
+
+
+$( "#results" ).on( "click", ".printMe", function() {
+    alert("print me!");
+    //getprint($(this).data("type"));
+    });
+
+
+
+function dosearch(term) {
+  showWait();
+  urlstem = "https://med-by-year.appspot.com/search?q=";
+  url = urlstem + encodeURIComponent(term);
+  $.get( url, function( data ) {
+    if (data.hasOwnProperty('counts')) {
+      searches.searchterms.push(term);
+      myCounts = data.counts;
+      for (var year in myCounts) {
+        searches.counts[year][term] = myCounts[year];
+      }
+      drawChart();
+    } else {
+      showDone();
+      $("#results").append('<div class="alert alert-danger" role="alert">Nothing found for this search. Please try again</div>');
+      return;
+    }
+  });
+
+  }
+
+$("#runsearch").click(function(){
+    handlesearch();
+  });
+
+ $(document).keypress(function(e) {
+  if(e.which == 13) {
+      //Because both IE and FF now "helpfully" ignore the spec and treat 'button' the same as 'submit'
+      e.preventDefault();
+      handlesearch();
+  }
+});
+
+
+
+function drawChart() {
+  $("#results").empty();
+  showDone();
+  $( "#results" ).append( '<div id="chart_div">' );
+
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Year');
+  for (i = 0; i < searches.searchterms.length; i++) {
+    data.addColumn('number', searches.searchterms[i]);
+  }
+
+
+  for (var year in searches.counts) {
+    if (Number(year) < 1945) { continue; }
+    if (Number(year) > thisYear) { continue; }
+    theseCounts = [year];
+    for (i = 0; i < searches.searchterms.length; i++) {
+      var term = searches.searchterms[i];
+      var yearTotal = Number(searches.counts[year]["total"]);
+      if (searches.counts[year][term]) {
+        var proportion = Number(searches.counts[year][term]) / yearTotal;
+        construct = {
+          v: proportion,
+          f: Number(searches.counts[year][term]).toLocaleString() + " citations, out of " + yearTotal.toLocaleString() + " in " + year
+        }
+        theseCounts.push(construct);
+        //theseCounts.push(proportion);
+      } else {
+        theseCounts.push(0);
+      }
+    }
+    data.addRow(theseCounts);
+  }
+  /*
+  var searchCompArray =  [];
+  var columns = ["Year"].concat(searches.searchterms);
+  searchCompArray.push(columns);
+
+  for (var year in searches.counts) {
+    if (Number(year) < 1700) { continue; }
+    theseCounts = [year];
+    for (i = 1; i < searchCompArray[0].length; i++) {
+      var term = searchCompArray[0][i];
+      var yearTotal = Number(searches.counts[year]["total"]);
+      if (searches.counts[year][term]) {
+        var proportion = Number(searches.counts[year][term]) / yearTotal;
+        theseCounts.push(proportion);
+      } else {
+        theseCounts.push(0);
+      }
+    }
+    searchCompArray.push(theseCounts);
+  }
+  */
+  var options = {
+        chart: {
+          title: 'Proportion of citations in PubMed',
+          subtitle: 'proportion for each search by year'
+        },
+        width: mywidth,
+        height: myheight,
+        vAxis: {format: 'decimal'}
+      };
+
+
+
+  //console.log( JSON.stringify ( searchCompArray ) );
+
+  //var data = google.visualization.arrayToDataTable(searchCompArray);
+  var chart = new google.charts.Line(document.getElementById('chart_div'));
+  //var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+  /*
+  //Here comes the clicky bit...
+  function selectHandler() {
+  var selectedItem = chart.getSelection()[0];
+  if (selectedItem) {
+    var selectstate = data.getValue(selectedItem.row, 0);
+    var resultsURL = 'https://www.ncbi.nlm.nih.gov/pubmed/';
+    resultsURL = resultsURL + '?term=' + mySearch.term + '+AND+(' + selectstate + '[mesh]+OR+' + selectstate + '[tiab])';
+     window.open(resultsURL,'_blank');
+   }
+  }
+
+  google.visualization.events.addListener(chart, 'select', selectHandler);
+  google.visualization.events.addListener(chart, 'ready', function () {
+    dataURL = chart.getImageURI();
+  });
+  */
+
+  chart.draw(data,  google.charts.Line.convertOptions(options));
+  $("#chart_div").append('<a href="#!" class="printMe">Printable version</a></dt>');
+
+  }
+
+$(".close").click(function(){
+  $("#printable").css("display", "none");
+      });
+
+$(document).click(function(event) {
+   var closeit = document.getElementById('printable');
+   if (event.target == closeit) {
+      $("#printable").css("display", "none");
+      }
+      });
+
+function keysrt(arr, key, reverse) {
+    var sortOrder = 1;
+    if(reverse){
+        sortOrder = -1;
+    }
+    return arr.sort(function(a, b) {
+        var x = a[key],
+            y = b[key];
+
+        return sortOrder * ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
+}
+
+})
+
+();
+
+
+
+
+</script>
+</body>
+</html>

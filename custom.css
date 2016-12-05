@@ -1,0 +1,161 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  /*margin-left: 4em;
+  margin-right: 4em;
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+  }
+
+  .footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+  padding-top:1em;
+}
+
+  /*.footer {
+    /*position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+  /*   height: 60px; */
+  /*  line-height: 60px; /* Vertically center the text there */
+    /*background-color: #f5f5f5;
+  }*/
+
+#topbanner {
+  color: white;
+  background-color: #258229;
+  font-family: "Century Gothic", Helvetica, sans-serif;
+  padding-top: .8em;
+  padding-bottom: 1em;
+  }
+
+#topbanner h1 {
+  font-size:
+}
+
+#search {
+    border: 1px solid grey;
+    border-radius: 10px;
+    margin-bottom: 2em;
+    padding: 2em;
+  }
+
+.hideme { display: none; }
+
+#loading {
+    font-size: 1.5em;
+    color: Gray;
+  }
+
+.percentagechart, .comparechart, .proportionchart {
+  padding: 1.5em;
+  margin-top: 1em;
+ }
+
+
+ .toggleview {
+     float: right;
+     right: 5%;
+   }
+
+
+ #left{
+   min-width: 700px;
+  }
+
+ #printable {
+   display: none; /* Hidden by default */
+   position: fixed; /* Stay in place */
+   z-index: 3; /* Sit on top */
+   padding-top: 100px; /* Location of the box */
+   left: 0;
+   top: 0;
+   width: 100%; /* Full width */
+   height: 100%; /* Full height */
+   overflow: auto; /* Enable scroll if needed */
+   background-color: rgb(0,0,0); /* Fallback color */
+   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+ }
+
+ #printable-stuff {
+   background-color: #fefefe;
+   margin: auto;
+   padding: 20px;
+   border: 1px solid #888;
+   width: 80%;
+ }
+
+ #percentkey {
+   float: right;
+   font-weight: bold;
+   font-size: .9em;
+ }
+
+#splash {
+  border: 1px solid grey;
+  border-radius: 10px;
+  margin-bottom: 2em;
+  padding: 2em;  border
+  }
+
+  #about {
+  	float: right;
+  	color: black;
+  	background-color: white;
+  	font-size: 125%;
+  }
+
+  #about:hover, #about:focus {
+  	background-color: #E4E3D2;
+  }
+
+#results { margin-bottom: 7em; }
+
+
+
+#past select {
+  margin-bottom: .7em;
+}
+
+#past [value="Compare"] {
+  margin-bottom: 1em;
+}
+
+.regionsearch {
+  padding: .6em;
+  margin: .4em;
+  border: 1.5px solid #212013;
+  font-weight: bold;
+  font-size: 1.2em;
+  width: 35%;
+  float: left;
+  border-radius: 4px;
+  background-color: #eeede2;
+}
+
+.regionsearch:hover, .regionsearch:focus {
+  background-color: #E4E3D2;
+}
+
+.chartnote {
+  color: gray;
+}
+.regioncount {
+  float: right;
+  font-weight: normal;
+  font-size: normal;
+}
+
+.example {
+  margin-top: 2em;
+}
