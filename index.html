@@ -6,6 +6,15 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script>
   </script>
+  <style type="text/css">
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://fonts.gstatic.com/s/roboto/v15/Fcx7Wwv8OzT71A3E1XOAjvesZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
+  }
+  </style>
+
 </head>
 
 <!--
@@ -26,14 +35,19 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 
 
 
-<div id="left" class="col-sm-12 col-md-12 col-lg-12">
-
+<div class="col-sm-12 col-md-8 col-lg-9">
 <div id="search" class="input-group input-group-lg">
   <input type="text" id="pmsearch" class="form-control">
   <span class="input-group-btn">
     <button id="runsearch" class="btn btn-default" type="button">Search</button>
   </span>
+</div>
+</div>
 
+<div class="col-sm-12 col-md-4 col-lg-3">
+  <div id="pickyears">
+  </div>
+  <button id="reset" type="button">Reset Searches</button>
 </div>
 
 <div id="printable">
@@ -42,14 +56,18 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
   </div>
 </div>
 
+<div id="left" class="col-sm-12 col-md-12 col-lg-12">
 <div id="results">
 <div id="chart_div">
   <div id="splash">
+    <p>Enter <a href="https://www.ncbi.nlm.nih.gov/books/NBK3827/#pubmedhelp.PubMed_Quick_Start">any PubMed search</a> above to see how the results change over time.</p>
     <p>MEDLINE by Year shows how your MEDLINE search compares to the database as whole...
       <em><a href="about.html">(more)</a></em></p>
     </div>
 </div>
 </div>
+</div>
+
 </div>
 
 <div class="col-sm-12 col-md-2 col-lg-3">
@@ -85,9 +103,13 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 (function() {
 
 var searches = { counts:{}, searchterms:[] };
+var dataURL = "";
 var basecounts = {};
 var d = new Date();
 var thisYear = d.getFullYear();
+
+var startYear = 1945;
+var endYear = thisYear;
 
 $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
   //build out our data structure
@@ -95,7 +117,10 @@ $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
   for (var year in allCounts) {
     searches.counts[year] = { "total": allCounts[year] } ;
   }
+  pickYears(startYear, endYear);
 });
+
+
 
 //var search = [];
 google.charts.load('current', {'packages':['line']});
@@ -140,12 +165,52 @@ function showWait() {
     $("#fetchresults").remove();
     }
 
+  function pickYears(startYear, endYear) {
+    console.log( typeof startYear);
+    $("#pickyears").empty();
+    $("#pickyears").append('Start: <select name="startyear">');
+    $("#pickyears").append('&nbsp;End: <select name="endyear">');
+    for (var year in searches.counts) {
+      if (Number(year) < 1600) { continue; }
+      if (Number(year) < endYear) {
+        if (year == startYear) {
+          $("[name=startyear]").append('<option value="' + year + '" selected="selected">' + year + '</option>');
+        } else {
+          $("[name=startyear]").append('<option value="' + year + '">' + year + '</option>');
+        }
+      }
+      if (Number(year) > startYear) {
+        if (year == endYear) {
+          $("[name=endyear]").append('<option value="' + year + '" selected="selected">' + year + '</option>');
+        } else {
+          $("[name=endyear]").append('<option value="' + year + '">' + year + '</option>');
+        }
+      }
+    }
+  }
 
 $( "#results" ).on( "click", ".printMe", function() {
-    alert("print me!");
-    //getprint($(this).data("type"));
+    //alert("print me!");
+    getprint();
     });
 
+  $( "#pickyears" ).on( "change", "[name=startyear]", function() {
+    pickYears(Number($("[name=startyear]").val()), Number($("[name=endyear]").val()));
+    if (searches.searchterms.length > 0) {
+        drawChart();
+    }
+  });
+
+  $( "#pickyears" ).on( "change", "[name=endyear]", function() {
+    pickYears(Number($("[name=startyear]").val()), Number($("[name=endyear]").val()));
+    if (searches.searchterms.length > 0) {
+      drawChart();
+    }
+  });
+
+  $( "#reset" ).click(function() {
+    location.reload();
+  });
 
 
 function dosearch(term) {
@@ -157,13 +222,18 @@ function dosearch(term) {
       searches.searchterms.push(term);
       myCounts = data.counts;
       for (var year in myCounts) {
+        console.log(year);
         searches.counts[year][term] = myCounts[year];
       }
       drawChart();
     } else {
       showDone();
-      $("#results").append('<div class="alert alert-danger" role="alert">Nothing found for this search. Please try again</div>');
-      return;
+      alert("Nothing found for this search or too few results to chart by year. Please try again");
+      if (searches.searchterms.length > 0) {
+          drawChart();
+      } else {
+        return;
+      }
     }
   });
 
@@ -186,7 +256,10 @@ $("#runsearch").click(function(){
 function drawChart() {
   $("#results").empty();
   showDone();
+  $("#results").append('<p>Search again above to compare results. Choose "Reset Searches" to start over.</p>');
   $( "#results" ).append( '<div id="chart_div">' );
+  var searchArgs = searches.searchterms;
+  $( "#chart_div" ).after( searchArgs );
 
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Year');
@@ -196,8 +269,8 @@ function drawChart() {
 
 
   for (var year in searches.counts) {
-    if (Number(year) < 1945) { continue; }
-    if (Number(year) > thisYear) { continue; }
+    if (Number(year) < $("[name=startyear]").val()) { continue; }
+    if (Number(year) > $("[name=endyear]").val()) { continue; }
     theseCounts = [year];
     for (i = 0; i < searches.searchterms.length; i++) {
       var term = searches.searchterms[i];
@@ -206,7 +279,7 @@ function drawChart() {
         var proportion = Number(searches.counts[year][term]) / yearTotal;
         construct = {
           v: proportion,
-          f: Number(searches.counts[year][term]).toLocaleString() + " citations, out of " + yearTotal.toLocaleString() + " in " + year
+          f: Number(searches.counts[year][term]).toLocaleString() + " citations (out of " + yearTotal.toLocaleString() + " in " + year + ")"
         }
         theseCounts.push(construct);
         //theseCounts.push(proportion);
@@ -240,11 +313,12 @@ function drawChart() {
   var options = {
         chart: {
           title: 'Proportion of citations in PubMed',
-          subtitle: 'proportion for each search by year'
+          subtitle: 'proportion for each search by year, ' + $("[name=startyear]").val() + ' to ' + $("[name=endyear]").val()
         },
         width: mywidth,
         height: myheight,
-        vAxis: {format: 'decimal'}
+        vAxis: {format: 'decimal',
+                title: 'proportion'},
       };
 
 
@@ -255,28 +329,72 @@ function drawChart() {
   var chart = new google.charts.Line(document.getElementById('chart_div'));
   //var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 
-  /*
+
   //Here comes the clicky bit...
   function selectHandler() {
   var selectedItem = chart.getSelection()[0];
   if (selectedItem) {
-    var selectstate = data.getValue(selectedItem.row, 0);
+    var year = data.getValue(selectedItem.row, 0);
+    var thisSearchindex = selectedItem['column'];
+    var myterm = searches.searchterms[thisSearchindex-1];
     var resultsURL = 'https://www.ncbi.nlm.nih.gov/pubmed/';
-    resultsURL = resultsURL + '?term=' + mySearch.term + '+AND+(' + selectstate + '[mesh]+OR+' + selectstate + '[tiab])';
-     window.open(resultsURL,'_blank');
+    resultsURL = resultsURL + '?term=' + myterm + '+AND+' + year + '[DP]';
+    window.open(resultsURL,'_blank');
    }
   }
-
   google.visualization.events.addListener(chart, 'select', selectHandler);
-  google.visualization.events.addListener(chart, 'ready', function () {
-    dataURL = chart.getImageURI();
-  });
-  */
 
   chart.draw(data,  google.charts.Line.convertOptions(options));
   $("#chart_div").append('<a href="#!" class="printMe">Printable version</a></dt>');
 
   }
+
+  function getprint(type) {
+    $( "#printable img" ).remove();
+    $( "#hiddendiv" ).remove();
+    var chartsvg = document.getElementsByTagName("svg")[0];
+    var cln = chartsvg.cloneNode(true);
+    cln.setAttribute("id", "printchart");
+
+    var node = document.createElement("div");
+    node.setAttribute("style", "display: none;");
+    node.setAttribute("id", "hiddendiv");
+    node.appendChild(cln);
+    document.body.appendChild(node);
+
+    $('defs').append( "<style>@import url(https://fonts.googleapis.com/css?family=Roboto);</style>" );
+    /*
+    var newStyle = document.createElementNS("http://www.w3.org/2000/svg","style");
+    //newFont.innerHtml = "@import url(https://fonts.googleapis.com/css?family=Roboto);text { font-family:Roboto; }";
+    var textNode = document.createTextNode("@import url(https://fonts.googleapis.com/css?family=Roboto);");
+    newStyle.appendChild(textNode);
+    */
+    var printSvg = document.getElementById("printchart");
+
+
+    //do text stuff Here
+    console.log(printSvg);
+    appendText("Made with Mesh Category Graph: http://esperr.github.io/mesh-cat-graph/", "darkgrey", 15, myheight-5, "normal");
+    //alltext.setAttribute("font-family", "Roboto");
+    var xmlString = (new XMLSerializer).serializeToString(printSvg);
+    var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
+    $( "#printable-stuff" ).append('<img src="' + data_uri + '">');
+    $("#printable").css("display", "block");
+
+    function appendText(text, color, x, y, weight) {
+      var newText = document.createElementNS("http://www.w3.org/2000/svg","text");
+      newText.setAttributeNS(null,"font-size",".9em");
+      newText.setAttributeNS(null,"font-family","sans-serif");
+      newText.setAttributeNS(null,"x",x);
+      newText.setAttributeNS(null,"y",y);
+      newText.setAttributeNS(null,"fill",color);
+      newText.setAttributeNS(null,"font-weight",weight);
+      var textNode = document.createTextNode(text);
+      newText.appendChild(textNode);
+      printSvg.appendChild(newText);
+    }
+
+    }
 
 $(".close").click(function(){
   $("#printable").css("display", "none");
