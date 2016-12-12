@@ -4,8 +4,6 @@
   <title>MEDLINE by Year</title>
   <link href="custom.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script>
-  </script>
   <style type="text/css">
   @font-face {
     font-family: 'Roboto';
@@ -22,6 +20,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 -->
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <div class="container">
@@ -66,12 +65,16 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
     </div>
 </div>
 </div>
+
+<button type="button" id="sharelink" class="hideme btn-primary" data-toggle="modal" data-target=".sharing-link">Share this search</button>
+
 </div>
 
 </div>
 
 <div class="col-sm-12 col-md-2 col-lg-3">
 
+<!--
 <div id="past" class="panel panel-default hideme">
   <div class="panel-heading">
     <h3 class="panel-title">Past searches</h3>
@@ -79,6 +82,24 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
   <div class="panel-body">
   </div>
 </div>
+-->
+
+<div class="modal fade sharing-link" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Share this search</h4>
+      </div>
+      <div class="modal-body">
+        <p>Copy this link to save or share your search<p>
+        <p id="sharingUrlcontent"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <p style='clear: both; margin-bottom: 60px;'></p>
 <br />
 
@@ -111,13 +132,24 @@ var thisYear = d.getFullYear();
 var startYear = 1945;
 var endYear = thisYear;
 
+//Do we have a search or datespan specified in the querystring?
+if (location.search) {
+  var queryDict = {};
+  location.search.substr(1).split("&").forEach(function(item) {
+      queryDict[item.split("=")[0]] = item.split("=")[1]
+  })
+  querySearch(queryDict);
+}
+
+
+//Fetch our baseline counts from the webservice
 $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
   //build out our data structure
   var allCounts = data.counts;
   for (var year in allCounts) {
     searches.counts[year] = { "total": allCounts[year] } ;
   }
-  pickYears(startYear, endYear);
+  pickYears();
 });
 
 
@@ -140,6 +172,17 @@ if (currentwidth > mywidth) {
 //dosearch(term);
 //alert("done!");
 
+function querySearch(queryDict) {
+  console.log(queryDict);
+  if (queryDict["startyear"]) { startYear = queryDict["startyear"]; }
+  if (queryDict["endyear"]) { endYear = queryDict["endyear"]; }
+  for (var search in queryDict) {
+    if(search.match(/q/)) {
+      dosearch(queryDict[search]);
+    }
+  }
+}
+
 function handlesearch() {
   term = $("#pmsearch").val();
   dosearch(term);
@@ -147,6 +190,12 @@ function handlesearch() {
   document.getElementById('pmsearch').focus();
   }
 
+  /*
+  window.onpopstate = function(event) {
+    //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
+    querySearch(event.state);
+  };
+  */
 function showWait() {
   $( "#pmsearch" ).prop( "disabled", true );
   $( "#runsearch" ).prop( "disabled", true );
@@ -165,8 +214,7 @@ function showWait() {
     $("#fetchresults").remove();
     }
 
-  function pickYears(startYear, endYear) {
-    console.log( typeof startYear);
+  function pickYears() {
     $("#pickyears").empty();
     $("#pickyears").append('Start: <select name="startyear">');
     $("#pickyears").append('&nbsp;End: <select name="endyear">');
@@ -195,21 +243,25 @@ $( "#results" ).on( "click", ".printMe", function() {
     });
 
   $( "#pickyears" ).on( "change", "[name=startyear]", function() {
-    pickYears(Number($("[name=startyear]").val()), Number($("[name=endyear]").val()));
+    startYear = Number($("[name=startyear]").val());
+    pickYears();
     if (searches.searchterms.length > 0) {
         drawChart();
     }
   });
 
   $( "#pickyears" ).on( "change", "[name=endyear]", function() {
-    pickYears(Number($("[name=startyear]").val()), Number($("[name=endyear]").val()));
+    endYear = Number($("[name=endyear]").val());
+    pickYears();
     if (searches.searchterms.length > 0) {
       drawChart();
     }
   });
 
   $( "#reset" ).click(function() {
-    location.reload();
+    var currentLocation = location.hostname + location.pathname;
+    //alert (currentLocation);
+    location.replace(currentLocation);
   });
 
 
@@ -222,7 +274,6 @@ function dosearch(term) {
       searches.searchterms.push(term);
       myCounts = data.counts;
       for (var year in myCounts) {
-        console.log(year);
         searches.counts[year][term] = myCounts[year];
       }
       drawChart();
@@ -258,8 +309,30 @@ function drawChart() {
   showDone();
   $("#results").append('<p>Search again above to compare results. Choose "Reset Searches" to start over.</p>');
   $( "#results" ).append( '<div id="chart_div">' );
-  var searchArgs = searches.searchterms;
-  $( "#chart_div" ).after( searchArgs );
+  var myQuerystring = "";
+  //var queryDict = {};
+  for (i=0; i<searches.searchterms.length; i++) {
+    if (myQuerystring.length > 0) { myQuerystring = myQuerystring + "&"; }
+    var qindex = i+1;
+    //queryDict['q' + qindex.toString()] = searches.searchterms[i];
+    var querypart = 'q' + qindex.toString() + '=' + searches.searchterms[i];
+    myQuerystring = myQuerystring + querypart;
+  }
+  if (startYear != 1945) {
+    myQuerystring = myQuerystring + "&startyear=" + startYear;
+    //queryDict["startyear"] = startYear;
+  }
+  if (endYear != thisYear) {
+    myQuerystring = myQuerystring + "&endyear=" + endYear;
+    //queryDict["endyear"] = endYear;
+  }
+  //we clear the address bar...
+  var currentLocation = location.hostname + location.pathname;
+  history.pushState({}, "", currentLocation);
+  $( "#sharingUrlcontent" ).empty();
+  $( "#sharingUrlcontent" ).append( currentLocation + "?" +  myQuerystring );
+  $( "#sharelink" ).removeClass( "hideme" );
+
 
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Year');
@@ -269,8 +342,8 @@ function drawChart() {
 
 
   for (var year in searches.counts) {
-    if (Number(year) < $("[name=startyear]").val()) { continue; }
-    if (Number(year) > $("[name=endyear]").val()) { continue; }
+    if (Number(year) < startYear) { continue; }
+    if (Number(year) > endYear) { continue; }
     theseCounts = [year];
     for (i = 0; i < searches.searchterms.length; i++) {
       var term = searches.searchterms[i];
