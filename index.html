@@ -19,6 +19,9 @@
 Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 -->
 <body>
+<script type="text/javascript" src="http://canvg.github.io/canvg/rgbcolor.js"></script>
+<script type="text/javascript" src="http://canvg.github.io/canvg/StackBlur.js"></script>
+<script type="text/javascript" src="http://canvg.github.io/canvg/canvg.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -126,11 +129,15 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 var searches = { counts:{}, searchterms:[] };
 var dataURL = "";
 var basecounts = {};
+
 var d = new Date();
 var thisYear = d.getFullYear();
 
 var startYear = 1945;
 var endYear = thisYear;
+
+var data;
+var options;
 
 //Do we have a search or datespan specified in the querystring?
 if (location.search) {
@@ -246,7 +253,7 @@ $( "#results" ).on( "click", ".printMe", function() {
     startYear = Number($("[name=startyear]").val());
     pickYears();
     if (searches.searchterms.length > 0) {
-        drawChart();
+        drawMainChart();
     }
   });
 
@@ -254,7 +261,7 @@ $( "#results" ).on( "click", ".printMe", function() {
     endYear = Number($("[name=endyear]").val());
     pickYears();
     if (searches.searchterms.length > 0) {
-      drawChart();
+      drawMainChart();
     }
   });
 
@@ -276,12 +283,12 @@ function dosearch(term) {
       for (var year in myCounts) {
         searches.counts[year][term] = myCounts[year];
       }
-      drawChart();
+      drawMainChart();
     } else {
       showDone();
       alert("Nothing found for this search or too few results to chart by year. Please try again");
       if (searches.searchterms.length > 0) {
-          drawChart();
+          drawMainChart();
       } else {
         return;
       }
@@ -304,11 +311,13 @@ $("#runsearch").click(function(){
 
 
 
-function drawChart() {
+function drawMainChart() {
   $("#results").empty();
   showDone();
   $("#results").append('<p>Search again above to compare results. Choose "Reset Searches" to start over.</p>');
   $( "#results" ).append( '<div id="chart_div">' );
+  $( "#results" ).append( '<div id="chart_two">' );
+
   var myQuerystring = "";
   //var queryDict = {};
   for (i=0; i<searches.searchterms.length; i++) {
@@ -334,7 +343,7 @@ function drawChart() {
   $( "#sharelink" ).removeClass( "hideme" );
 
 
-  var data = new google.visualization.DataTable();
+  data = new google.visualization.DataTable();
   data.addColumn('string', 'Year');
   for (i = 0; i < searches.searchterms.length; i++) {
     data.addColumn('number', searches.searchterms[i]);
@@ -383,7 +392,7 @@ function drawChart() {
     searchCompArray.push(theseCounts);
   }
   */
-  var options = {
+  options = {
         chart: {
           title: 'Proportion of citations in PubMed',
           subtitle: 'proportion for each search by year, ' + $("[name=startyear]").val() + ' to ' + $("[name=endyear]").val()
@@ -415,44 +424,61 @@ function drawChart() {
     window.open(resultsURL,'_blank');
    }
   }
-  google.visualization.events.addListener(chart, 'select', selectHandler);
 
+  google.visualization.events.addListener(chart, 'select', selectHandler);
   chart.draw(data,  google.charts.Line.convertOptions(options));
+
   $("#chart_div").append('<a href="#!" class="printMe">Printable version</a></dt>');
 
   }
 
   function getprint(type) {
     $( "#printable img" ).remove();
-    $( "#hiddendiv" ).remove();
-    var chartsvg = document.getElementsByTagName("svg")[0];
-    var cln = chartsvg.cloneNode(true);
-    cln.setAttribute("id", "printchart");
+    var charttwo = new google.charts.Line(document.getElementById('chart_two'));
+    options.width = 600;
+    options.height = 300;
+    charttwo.draw(data,  google.charts.Line.convertOptions(options));
+    google.visualization.events.addListener(charttwo, 'ready', myReadyHandler);
 
-    var node = document.createElement("div");
-    node.setAttribute("style", "display: none;");
-    node.setAttribute("id", "hiddendiv");
-    node.appendChild(cln);
-    document.body.appendChild(node);
+    function myReadyHandler() {
+      $('#chart_two defs').append( "<style>@import url(https://fonts.googleapis.com/css?family=Roboto);</style>" );
+      var t = $("#chart_two svg")[0];
+      //xmlString = '<svg xmlns="http://www.w3.org/2000/svg" width="1053" height="526.5">' + t + "</svg>"
+      var xmlString = (new XMLSerializer).serializeToString(t);
+      console.log(xmlString);
+      $("#chart_two").addClass( "hideme" );
+      var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
+      $( "#printable-stuff" ).append('<img src="' + data_uri + '">');
+      $("#printable").css("display", "block");
+    }
 
-    $('defs').append( "<style>@import url(https://fonts.googleapis.com/css?family=Roboto);</style>" );
-    /*
-    var newStyle = document.createElementNS("http://www.w3.org/2000/svg","style");
+
+    //var chartsvg = document.getElementsByTagName("svg")[1];
+    //var cln = chartsvg.cloneNode(true);
+    //cln.setAttribute("id", "printchart");
+
+    //var node = document.createElement("div");
+    //node.setAttribute("style", "display: none;");
+    //node.setAttribute("id", "hiddendiv");
+    //node.appendChild(cln);
+    //document.body.appendChild(node);
+
+
+    //var newStyle = document.createElementNS("http://www.w3.org/2000/svg","style");
     //newFont.innerHtml = "@import url(https://fonts.googleapis.com/css?family=Roboto);text { font-family:Roboto; }";
-    var textNode = document.createTextNode("@import url(https://fonts.googleapis.com/css?family=Roboto);");
-    newStyle.appendChild(textNode);
-    */
-    var printSvg = document.getElementById("printchart");
+    //var textNode = document.createTextNode("@import url(https://fonts.googleapis.com/css?family=Roboto);");
+    //newStyle.appendChild(textNode);
+
+    //var printSvg = document.getElementById("printchart");
 
 
     //do text stuff Here
-    console.log(printSvg);
-    appendText("Made with Mesh Category Graph: http://esperr.github.io/mesh-cat-graph/", "darkgrey", 15, myheight-5, "normal");
+    //console.log(printSvg);
+    //appendText("Made with Mesh Category Graph: http://esperr.github.io/mesh-cat-graph/", "darkgrey", 15, myheight-5, "normal");
     //alltext.setAttribute("font-family", "Roboto");
-    var xmlString = (new XMLSerializer).serializeToString(printSvg);
-    var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
-    $( "#printable-stuff" ).append('<img src="' + data_uri + '">');
-    $("#printable").css("display", "block");
+    //console.log(chartsvg);
+
+
 
     function appendText(text, color, x, y, weight) {
       var newText = document.createElementNS("http://www.w3.org/2000/svg","text");
