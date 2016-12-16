@@ -33,7 +33,7 @@ body {
 
 #topbanner {
   color: white;
-  background-color: #258229;
+  background-color: rgb(70,131,193);
   font-family: "Century Gothic", Helvetica, sans-serif;
   padding-top: .8em;
   padding-bottom: 1em;
@@ -95,19 +95,6 @@ body {
    width: 80%;
  }
 
- #percentkey {
-   float: right;
-   font-weight: bold;
-   font-size: .9em;
- }
-
-#splash {
-  border: 1px solid grey;
-  border-radius: 10px;
-  margin-bottom: 2em;
-  padding: 2em;  border
-  }
-
   #about {
   	float: right;
   	color: black;
@@ -119,7 +106,7 @@ body {
   	background-color: #E4E3D2;
   }
 
-#results { margin-bottom: 7em; }
+#results { margin-bottom: 4em; }
 
 
 
@@ -150,12 +137,31 @@ body {
 .chartnote {
   color: gray;
 }
+
 .regioncount {
   float: right;
   font-weight: normal;
   font-size: normal;
 }
 
-.example {
-  margin-top: 2em;
+#reset {
+  float: right;
+}
+
+.modal.modal-wide .modal-dialog {
+  width: 90%;
+}
+.modal-wide .modal-body {
+  overflow-y: auto;
+}
+
+.modal.modal-medium .modal-dialog {
+  width: 70%;
+}
+.modal-medium .modal-body {
+  overflow-y: auto;
+}
+
+.splash {
+  max-width: 55em;
 }
