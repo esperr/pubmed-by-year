@@ -1,7 +1,7 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-  <title>MEDLINE by Year</title>
+  <title>PubMed by Year</title>
   <link href="custom.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <style type="text/css">
@@ -29,8 +29,8 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 <div class="container">
 
 <div id="topbanner" class="jumbotron">
-  <h1>MEDLINE by Year</h1>
-  <a id="about" class="label label-default" href="about.html">About MEDLINE by Year</a>
+  <h1>PubMed by Year</h1>
+  <a id="about" class="label label-default" href="about.html">About PubMed by Year</a>
 </div>
 
 <div class="row">
@@ -41,43 +41,55 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 <div id="search" class="input-group input-group-lg">
   <input type="text" id="pmsearch" class="form-control">
   <span class="input-group-btn">
-    <button id="runsearch" class="btn btn-default" type="button">Search</button>
+    <button id="runsearch" class="btn btn-primary" type="button">Search</button>
   </span>
 </div>
 </div>
 
 <div class="col-sm-12 col-md-4 col-lg-3">
-  <div id="pickyears">
+  <div class="panel panel-default">
+    <div class="panel-heading">Year Range</div>
+    <div class="panel-body">
+      <div id="pickyears"></div>
+    </div>
   </div>
-  <button id="reset" type="button">Reset Searches</button>
 </div>
 
+</div><!--row-->
+
+<!--
 <div id="printable">
   <div id="printable-stuff">
   <span class="close">×</span>
   </div>
 </div>
-
+-->
+<div class="row">
 <div id="left" class="col-sm-12 col-md-12 col-lg-12">
 <div id="results">
-<div id="chart_div">
-  <div id="splash">
-    <p>Enter <a href="https://www.ncbi.nlm.nih.gov/books/NBK3827/#pubmedhelp.PubMed_Quick_Start">any PubMed search</a> above to see how the results change over time.</p>
-    <p>MEDLINE by Year shows how your MEDLINE search compares to the database as whole...
+<div id="splash" class="panel panel-default splash">
+  <div class="panel-body">
+    <p>PubMed by Year shows your search proportionally, comparing the results for each year to the database as whole.</p>
+    <p>Enter any <a href="https://www.ncbi.nlm.nih.gov/pubmed/">PubMed</a> search above to see how your results change over time.
+    You can use one word (e.g. <a class="example" data-srchstr="q1=heart">heart</a>, <a class="example" data-srchstr="q1=diabetes">diabetes</a>) or
+    several (<a class="example" data-srchstr="q1=breast cancer">breast cancer</a>, <a class="example" data-srchstr="q1=myocardial infarction">myocardial infarction</a>).
+    You can even use more advanced techniques such as field tags (<a class="example" data-srchstr="Leukemia[Mesh]">Leukemia[Mesh]</a>, <a class="example" data-srchstr="q1=pubmednotmedline [sb]">pubmednotmedline [sb]</a>) or
+    boolean operators (<a class="example" data-srchstr="q1=smoking AND lung cancer ">smoking AND lung cancer</a>, <a class="example" data-srchstr="q1=polio AND (vaccine OR vaccination)">polio AND (vaccine OR vaccination)</a>).
+    Finally, by entering multiple searches one at a time, you can easily <a class="example" data-srchstr="q1=dengue&q2=chikungunya&q3=zika">compare</a> them.
+    Once you're finished, you can easily share your results with others or save your graphs for later.
+
       <em><a href="about.html">(more)</a></em></p>
     </div>
 </div>
 </div>
-
-<button type="button" id="sharelink" class="hideme btn-primary" data-toggle="modal" data-target=".sharing-link">Share this search</button>
-
 </div>
 
-</div>
+</div><!--row-->
 
-<div class="col-sm-12 col-md-2 col-lg-3">
 
 <!--
+<div class="col-sm-12 col-md-2 col-lg-3">
+
 <div id="past" class="panel panel-default hideme">
   <div class="panel-heading">
     <h3 class="panel-title">Past searches</h3>
@@ -87,37 +99,57 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 </div>
 -->
 
-<div class="modal fade sharing-link" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-  <div class="modal-dialog modal-lg" role="document">
+<div id="sharing-link" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Share this search</h4>
       </div>
       <div class="modal-body">
-        <p>Copy this link to save or share your search<p>
-        <p id="sharingUrlcontent"></p>
+        <input type="text" id="sharingUrlcontent">
+      </div>
+      <div class="modal-footer">
+        <p>Copy the link above</p>
       </div>
     </div>
   </div>
 </div>
 
+<div id="printchart" class="modal modal-wide fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Printable Chart</h4>
+      </div>
+      <div class="modal-body">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="modal-footer">
+        <p>Right click on image to save</p>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" id="changesize" class="btn btn-primary">View Larger Size</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <p style='clear: both; margin-bottom: 60px;'></p>
 <br />
 
 </div>
 
-
+<!--
 </div>
 </div>
-
+-->
 
 <footer class="footer">
   <div class="container">
     <span class="text-muted">  <p>Design and contruction by Ed Sperr, M.L.I.S. (<a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a>)   |
-      Data from <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>  |   Charting tools from  <a href="https://developers.google.com/chart/interactive/docs/gallery/geochart" target="_blank">Google</a>
-     | See the code at <a href="https://github.com/esperr/mapping-medline">GitHub</a></p></span>
+      Data from <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a>  |   Charting tools from  <a href="https://developers.google.com/chart/interactive/docs/gallery/linechart" target="_blank">Google</a>
+     | See the code at <a href="https://github.com/esperr/pubmed-by-year">GitHub</a></p></span>
   </div>
 </footer>
 
@@ -139,6 +171,8 @@ var endYear = thisYear;
 var data;
 var options;
 
+var printsize = "small";
+
 //Do we have a search or datespan specified in the querystring?
 if (location.search) {
   var queryDict = {};
@@ -157,8 +191,10 @@ $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
     searches.counts[year] = { "total": allCounts[year] } ;
   }
   pickYears();
+})
+.fail(function() {
+  alert( "There was some sort of problem -- please reload the page" );
 });
-
 
 
 //var search = [];
@@ -180,12 +216,12 @@ if (currentwidth > mywidth) {
 //alert("done!");
 
 function querySearch(queryDict) {
-  console.log(queryDict);
   if (queryDict["startyear"]) { startYear = queryDict["startyear"]; }
   if (queryDict["endyear"]) { endYear = queryDict["endyear"]; }
   for (var search in queryDict) {
     if(search.match(/q/)) {
-      dosearch(queryDict[search]);
+      term = decodeURIComponent(queryDict[search])
+      dosearch(term);
     }
   }
 }
@@ -197,12 +233,17 @@ function handlesearch() {
   document.getElementById('pmsearch').focus();
   }
 
-  /*
+
   window.onpopstate = function(event) {
-    //alert("location: " + document.location + ", state: " + JSON.stringify(event.state));
-    querySearch(event.state);
+    //reconstitute earlier searches if the user is going "back"
+    if (event.state) {
+      searches = event.state["myData"];
+      startYear = event.state["startyear"];
+      endYear = event.state["endyear"];
+      drawMainChart();
+    }
   };
-  */
+
 function showWait() {
   $( "#pmsearch" ).prop( "disabled", true );
   $( "#runsearch" ).prop( "disabled", true );
@@ -224,7 +265,7 @@ function showWait() {
   function pickYears() {
     $("#pickyears").empty();
     $("#pickyears").append('Start: <select name="startyear">');
-    $("#pickyears").append('&nbsp;End: <select name="endyear">');
+    $("#pickyears").append('&nbsp;&nbsp;End: <select name="endyear">');
     for (var year in searches.counts) {
       if (Number(year) < 1600) { continue; }
       if (Number(year) < endYear) {
@@ -244,9 +285,17 @@ function showWait() {
     }
   }
 
+$(".example").click(function(){
+    var searchstr = $( this ).attr("data-srchstr");
+     window.open(location.pathname + "?" + searchstr);
+    });
+
 $( "#results" ).on( "click", ".printMe", function() {
-    //alert("print me!");
     getprint();
+    });
+
+$( "#results" ).on( "click", ".shareLink", function() {
+    $('#sharing-link').modal();
     });
 
   $( "#pickyears" ).on( "change", "[name=startyear]", function() {
@@ -265,17 +314,26 @@ $( "#results" ).on( "click", ".printMe", function() {
     }
   });
 
-  $( "#reset" ).click(function() {
+  $( "#results" ).on( "click", "#reset", function() {
     var currentLocation = location.hostname + location.pathname;
     //alert (currentLocation);
     location.replace(currentLocation);
   });
 
+  $( "#changesize" ).click(function() {
+    if ( printsize == "small" ) {
+      printsize = "large";
+    } else {
+      printsize = "small";
+    }
+    getprint();
+  });
 
 function dosearch(term) {
   showWait();
   urlstem = "https://med-by-year.appspot.com/search?q=";
   url = urlstem + encodeURIComponent(term);
+  console.log(url);
   $.get( url, function( data ) {
     if (data.hasOwnProperty('counts')) {
       searches.searchterms.push(term);
@@ -293,6 +351,9 @@ function dosearch(term) {
         return;
       }
     }
+  })
+  .fail(function() {
+    alert( "There was some sort of problem -- please reload the page" );
   });
 
   }
@@ -314,9 +375,18 @@ $("#runsearch").click(function(){
 function drawMainChart() {
   $("#results").empty();
   showDone();
-  $("#results").append('<p>Search again above to compare results. Choose "Reset Searches" to start over.</p>');
-  $( "#results" ).append( '<div id="chart_div">' );
+  if (startYear < 1945) {
+    $("#results").append('<div class="alert alert-warning" role="alert">');
+    $("#results .alert").append('<strong>Remember:</strong> OLDMEDLINE only goes back to 1946, so results are sparse before then');
+  }
+  $("#results").append('<p>Search again above to compare results on your chart. Choose "Reset Searches" below to start over.</p>');
+  $("#results").append('<p>Hover to see details for a given year. Click to launch a search in PubMed</p>');
+
+  $( "#results" ).append( '<div class="panel panel-default">' );
+  $( "#results .panel" ).append( '<div id="chart_div" class="panel-body">' );
+  //"hidden" div where we draw the printable chart
   $( "#results" ).append( '<div id="chart_two">' );
+  $("#results .panel").after('<button id="reset" type="button" class="btn btn-warning">Reset Searches</button>');
 
   var myQuerystring = "";
   //var queryDict = {};
@@ -335,14 +405,6 @@ function drawMainChart() {
     myQuerystring = myQuerystring + "&endyear=" + endYear;
     //queryDict["endyear"] = endYear;
   }
-  //we clear the address bar...
-  var currentLocation = location.hostname + location.pathname;
-  history.pushState({}, "", currentLocation);
-  $( "#sharingUrlcontent" ).empty();
-  $( "#sharingUrlcontent" ).append( currentLocation + "?" +  myQuerystring );
-  $( "#sharelink" ).removeClass( "hideme" );
-
-
   data = new google.visualization.DataTable();
   data.addColumn('string', 'Year');
   for (i = 0; i < searches.searchterms.length; i++) {
@@ -371,27 +433,13 @@ function drawMainChart() {
     }
     data.addRow(theseCounts);
   }
-  /*
-  var searchCompArray =  [];
-  var columns = ["Year"].concat(searches.searchterms);
-  searchCompArray.push(columns);
+  //we clear the address bar...
+  var currentLocation = location.hostname + location.pathname;
+  history.pushState({ "myData": searches, "startyear": startYear, "endyear": endYear }, "", currentLocation);
+  var shareUrl = currentLocation + "?" +  myQuerystring;
+  $( "#sharingUrlcontent" ).attr( "style", "width: 35em;" );
+  $( "#sharingUrlcontent" ).attr( "value", shareUrl );
 
-  for (var year in searches.counts) {
-    if (Number(year) < 1700) { continue; }
-    theseCounts = [year];
-    for (i = 1; i < searchCompArray[0].length; i++) {
-      var term = searchCompArray[0][i];
-      var yearTotal = Number(searches.counts[year]["total"]);
-      if (searches.counts[year][term]) {
-        var proportion = Number(searches.counts[year][term]) / yearTotal;
-        theseCounts.push(proportion);
-      } else {
-        theseCounts.push(0);
-      }
-    }
-    searchCompArray.push(theseCounts);
-  }
-  */
   options = {
         chart: {
           title: 'Proportion of citations in PubMed',
@@ -403,14 +451,7 @@ function drawMainChart() {
                 title: 'proportion'},
       };
 
-
-
-  //console.log( JSON.stringify ( searchCompArray ) );
-
-  //var data = google.visualization.arrayToDataTable(searchCompArray);
   var chart = new google.charts.Line(document.getElementById('chart_div'));
-  //var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-
 
   //Here comes the clicky bit...
   function selectHandler() {
@@ -428,69 +469,66 @@ function drawMainChart() {
   google.visualization.events.addListener(chart, 'select', selectHandler);
   chart.draw(data,  google.charts.Line.convertOptions(options));
 
-  $("#chart_div").append('<a href="#!" class="printMe">Printable version</a></dt>');
+  $("#chart_div").append('<a href="#!" class="printMe">Printable version</a>');
+  $("#chart_div").append('<p>Share this search: <a href="#!" class="shareLink">Link</a></p>');
 
   }
 
-  function getprint(type) {
-    $( "#printable img" ).remove();
+  function getprint() {
+    //$( "#printable img" ).remove();
+    $("#chart_two").removeClass( "hideme" );
+    if (printsize == "small") {
+      width = 600;
+      height = 300;
+      $("canvas").attr("width", "600");
+      $("canvas").attr("height", "330");
+      $("#printchart").removeClass("modal-wide");
+      $("#printchart").addClass("modal-medium");
+      $("#changesize").text("Larger size");
+    }
+    if (printsize == "large") {
+      width = 1200;
+      height = 600;
+      $("canvas").attr("width", "1200");
+      $("canvas").attr("height", "630");
+      $("#printchart").removeClass("modal-medium");
+      $("#printchart").addClass("modal-wide");
+      $("#changesize").text("Smaller size");
+    }
     var charttwo = new google.charts.Line(document.getElementById('chart_two'));
-    options.width = 600;
-    options.height = 300;
+    options.width = width;
+    options.height = height;
     charttwo.draw(data,  google.charts.Line.convertOptions(options));
     google.visualization.events.addListener(charttwo, 'ready', myReadyHandler);
 
     function myReadyHandler() {
-      $('#chart_two defs').append( "<style>@import url(https://fonts.googleapis.com/css?family=Roboto);</style>" );
       var t = $("#chart_two svg")[0];
-      //xmlString = '<svg xmlns="http://www.w3.org/2000/svg" width="1053" height="526.5">' + t + "</svg>"
       var xmlString = (new XMLSerializer).serializeToString(t);
-      console.log(xmlString);
+      var canvchart = document.createElement("canvas");
+      canvg(canvchart, xmlString, { log: true, ignoreMouse: true, ignoreAnimation: true });
+      var c2 = document.createElement("canvas");
+      c2.width = width;
+      c2.height = height + 40;
+      var ctx = c2.getContext('2d');
+      ctx.beginPath();
+      ctx.rect(0, 0, width, height + 40);
+      ctx.fillStyle = "white";
+      ctx.fill();
+      ctx.font="13px Roboto";
+      ctx.fillStyle = "Gray";
+      ctx.fillText("Made with MEDLINE by Year: http://esperr.github.io/medline-by-year",0,height + 25);
+
+      //var can = document.getElementById('canvas');
+      var can3 = document.getElementById('canvas');
+      var ctx3 = can3.getContext('2d');
+
+      ctx3.drawImage(c2, 0, 0);
+      ctx3.drawImage(canvchart, 0, 0);
+      var newdataURL = c2.toDataURL();
+      console.log(newdataURL);
       $("#chart_two").addClass( "hideme" );
-      var data_uri = "data:image/svg+xml;base64," + window.btoa(xmlString);
-      $( "#printable-stuff" ).append('<img src="' + data_uri + '">');
-      $("#printable").css("display", "block");
-    }
-
-
-    //var chartsvg = document.getElementsByTagName("svg")[1];
-    //var cln = chartsvg.cloneNode(true);
-    //cln.setAttribute("id", "printchart");
-
-    //var node = document.createElement("div");
-    //node.setAttribute("style", "display: none;");
-    //node.setAttribute("id", "hiddendiv");
-    //node.appendChild(cln);
-    //document.body.appendChild(node);
-
-
-    //var newStyle = document.createElementNS("http://www.w3.org/2000/svg","style");
-    //newFont.innerHtml = "@import url(https://fonts.googleapis.com/css?family=Roboto);text { font-family:Roboto; }";
-    //var textNode = document.createTextNode("@import url(https://fonts.googleapis.com/css?family=Roboto);");
-    //newStyle.appendChild(textNode);
-
-    //var printSvg = document.getElementById("printchart");
-
-
-    //do text stuff Here
-    //console.log(printSvg);
-    //appendText("Made with Mesh Category Graph: http://esperr.github.io/mesh-cat-graph/", "darkgrey", 15, myheight-5, "normal");
-    //alltext.setAttribute("font-family", "Roboto");
-    //console.log(chartsvg);
-
-
-
-    function appendText(text, color, x, y, weight) {
-      var newText = document.createElementNS("http://www.w3.org/2000/svg","text");
-      newText.setAttributeNS(null,"font-size",".9em");
-      newText.setAttributeNS(null,"font-family","sans-serif");
-      newText.setAttributeNS(null,"x",x);
-      newText.setAttributeNS(null,"y",y);
-      newText.setAttributeNS(null,"fill",color);
-      newText.setAttributeNS(null,"font-weight",weight);
-      var textNode = document.createTextNode(text);
-      newText.appendChild(textNode);
-      printSvg.appendChild(newText);
+      $('#printchart').modal();
+      //$("#printable").css("display", "block");
     }
 
     }
