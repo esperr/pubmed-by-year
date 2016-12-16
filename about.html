@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+ <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="custom.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<title>About PubMed by Year</title>
+</head>
+
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<div class="container">
+<div id="topbanner" class="jumbotron">
+	<h1>About PubMed by Year</h1>
+	<a id="about" class="label label-default" href="index.html">Home</a>
+</div>
+   <div class="row">
+
+<div class="col-sm-7 col-md-7 col-lg-7 aboutleft">
+	<div class="panel panel-default">
+	<div class="panel-body">
+		<h2>Why PubMed by Year?</h2>
+    <p>The biomedical literature is a not only a tool to find the newest answers, but is also a record of what researchers and clinicians
+      have concerned themselves with over the decades. <a href="http://www.ncbi.nlm.nih.gov/pubmed">PubMed</a> does a thorough job of covering this vast literature, as it contains citations from around
+      <a href="https://www.nlm.nih.gov/bsd/serfile_addedinfo.html">26,000 journals</a> published around the world. MEDLINE and OLDMEDLINE take us <a href="https://www.nlm.nih.gov/services/indexmedicus.html">all the way back to 1946</a>,
+      though there are also a smattering of <a href="https://www.ncbi.nlm.nih.gov/pmc/">PubMed Central</a> citations between the nineteenth century and then.</p>
+    <h2>How it works</h2>
+    <p>PubMed records are indexed to different degrees of granualarity, but every citation has a publication date. Results for each year are compared with that year's total in the database, and the resulting proportion is plotted on a graph.
+       We use proportions instead of raw numbers, as the the <a href="https://www.nlm.nih.gov/bsd/medline_cit_counts_yr_pub.html">astonishing increase</a> of the biomedical literature over time makes a bare count less illustrative of changes
+       for any given search.</p>
+    <h2>Caveats</h2>
+      <p>When you enter a search into the search bar, you are searching PubMed directly, meaning that your search is parsed by NCBI's <a href="https://www.ncbi.nlm.nih.gov/books/NBK3827/#pubmedhelp.How_PubMed_works_automatic_te">automatic term mapping</a>
+        algorithm. If something doesn't make sense, be sure to launch the search in PubMed (by clicking on any year on the graph) and examine the "Search details" box. Use caution when interpreting the results of a <a href="https://www.nlm.nih.gov/mesh/meshhome.html">
+          Medical Subject Heading</a> search, as older records are not typically re-indexed after a new heading is added to the thesaurus</a>.
+	</div>
+	</div>
+</div>
+
+<div class="col-sm-5 col-md-5 col-lg-5">
+ <div class="panel panel-default">
+<div class="panel-body">
+<h3>Contact</h3>
+<p>PubMed by Year is a experimental project of Ed Sperr, M.L.I.S.</p>
+<p>Ed can be reached at <a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a> or <a href="mailto:esperr@uga.edu">esperr@uga.edu</a>.</p>
+      </div>
+   </div>
+
+	<div class="panel panel-default">
+	<div class="panel-body">
+  	<h3>Technologies</h3>
+		<p>PubMed by Year is lashed together with bailing wire and and <a href="http://jquery.com/">jQuery</a>. NCBI does not have an easy way to grab by-year counts for a search (short of launching 50+ calls to the API), so a <a href="https://github.com/esperr/med-by-year">custom webservice</a>
+      is used to fetch them. <a href="https://developers.google.com/chart/interactive/docs/gallery/linechart">Google Charts</a> is used to draw the charts and responsive layout is made easier with <a href="http://getbootstrap.com/">Bootstrap</a>.</p>
+    <p>You can find the source code for this application at <a href="https://github.com/esperr/pubmed-by-year">GitHub</a>.</p>
+
+    <h3>License</h3>
+		<p>Please note that the information provided here comes ultimately from the <a href="http://www.ncbi.nlm.nih.gov/">National Center for Biotechnology Information</a> and is subject to the terms listed under their
+		<a href="http://www.ncbi.nlm.nih.gov/About/disclaimer.html">Disclaimer and Copyright notice</a>.</p>
+    <p>Feel free to us this tool as you wish, but if you use PubMed by Year for publication, I'd appreciate a citation:
+      <blockquote>
+        Sperr E. PubMed by Year [Internet]. 2016 [cited <em>your_date_here</em>]. Available from http://esperr.github.io/pubmed-by-year/
+      </blockquote>
+    </p>
+
+  </div>
+	</div>
+
+
+
+  <div class="panel panel-default">
+  <div class="panel-body">
+    <h2>See also...</h2>
+    <p>Want to have even more fun with MEDLINE visualizations? Check out <a href="http://esperr.github.io/mesh-cat-graph/">
+      MeSH Category Graph</a>, <a href="https://esperr.github.io/mesh-subhead-graph/">MeSH Subheading Graph</a>, <a href="https://pubvenn.appspot.com/">PubVenn</a>
+      and <a href="https://esperr.github.io/mapping-medline/">Mapping MEDLINE</a>.</p>
+  </div>
+  </div>
+
+      </div>
+
+</div>
+</div>
+<script>
+(function() {
+var currentwidth = $(".aboutleft").innerWidth() * .9;
+console.log(currentwidth);
+$("img").width(currentwidth);
+})
+
+();
+</script>
+
+</body>
