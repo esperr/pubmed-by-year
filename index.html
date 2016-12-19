@@ -317,9 +317,9 @@ $( "#results" ).on( "click", ".shareLink", function() {
   });
 
   $( "#results" ).on( "click", "#reset", function() {
-    var currentLocation = location.hostname + location.pathname;
+    //var currentLocation = location.hostname + location.pathname;
     //alert (currentLocation);
-    location.replace(currentLocation);
+    location.replace(location.pathname);
   });
 
   $( "#changesize" ).click(function() {
