@@ -439,8 +439,8 @@ function drawMainChart() {
     data.addRow(theseCounts);
   }
   //we clear the address bar...
-  console.log(shareUrl);
-  history.pushState({ "myData": searches, "startyear": startYear, "endyear": endYear }, "", shareUrl);
+  var ourLocation = location.pathname + "?" + myQuerystring;
+  history.pushState({ "myData": searches, "startyear": startYear, "endyear": endYear }, "No real title here", ourLocation);
 
 
   options = {
