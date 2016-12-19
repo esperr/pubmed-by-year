@@ -411,7 +411,7 @@ function drawMainChart() {
   var shareUrl = currentLocation + "?" +  myQuerystring;
   $( "#sharingUrlcontent" ).attr( "style", "width: 35em;" );
   $( "#sharingUrlcontent" ).attr( "value", shareUrl );
-  
+
   data = new google.visualization.DataTable();
   data.addColumn('string', 'Year');
   for (i = 0; i < searches.searchterms.length; i++) {
@@ -442,7 +442,7 @@ function drawMainChart() {
   }
   //we clear the address bar...
 
-  history.pushState({ "myData": searches, "startyear": startYear, "endyear": endYear }, "", currentLocation);
+  history.pushState({ "myData": searches, "startyear": startYear, "endyear": endYear }, "", shareUrl);
 
 
   options = {
