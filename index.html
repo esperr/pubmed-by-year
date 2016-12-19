@@ -174,7 +174,6 @@ var options;
 var printsize = "small";
 
 var currentLocation = location.hostname + location.pathname;
-console.log(currentLocation);
 
 //Do we have a search or datespan specified in the querystring?
 if (location.search) {
@@ -336,7 +335,6 @@ function dosearch(term) {
   showWait();
   urlstem = "https://med-by-year.appspot.com/search?q=";
   url = urlstem + encodeURIComponent(term);
-  console.log(url);
   $.get( url, function( data ) {
     if (data.hasOwnProperty('counts')) {
       searches.searchterms.push(term);
@@ -441,7 +439,7 @@ function drawMainChart() {
     data.addRow(theseCounts);
   }
   //we clear the address bar...
-
+  console.log(shareUrl);
   history.pushState({ "myData": searches, "startyear": startYear, "endyear": endYear }, "", shareUrl);
 
 
@@ -530,7 +528,6 @@ function drawMainChart() {
       ctx3.drawImage(c2, 0, 0);
       ctx3.drawImage(canvchart, 0, 0);
       var newdataURL = c2.toDataURL();
-      console.log(newdataURL);
       $("#chart_two").addClass( "hideme" );
       $('#printchart').modal();
       //$("#printable").css("display", "block");
