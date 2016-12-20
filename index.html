@@ -207,7 +207,6 @@ $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
   alert( "There was some sort of problem -- please reload the page" );
 });
 
-
 //var search = [];
 google.charts.load('current', {'packages':['line']});
 //google.charts.load('current', {packages: ['corechart', 'line']});
@@ -354,19 +353,43 @@ function dosearch(term) {
       drawMainChart();
     } else {
       showDone();
-      alert("Nothing found for this search or too few results to chart by year. Please try again");
-      if (searches.searchterms.length > 0) {
-          drawMainChart();
-      } else {
-        return;
-      }
+      getTotals(term);
+      $("#results").append('<div id="noJoy" class="alert alert-warning alert-danger" role="alert">');
+      $("#results .alert").append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+      $("#results .alert").append('<h4>Sorry!&nbsp;</h4>');
+      $("#results .alert").append("<p><div id=noJoymsg></div></p>");
+      //'alert("Nothing found for this search or too few results to chart by year. Please try again");
+      $('#noJoy').on('closed.bs.alert', function () {
+        if (searches.searchterms.length > 0) {
+            drawMainChart();
+        } else {
+          return;
+        }
+      })
     }
   })
   .fail(function() {
     alert( "There was some sort of problem -- please reload the page" );
   });
-
   }
+
+function getTotals(term) {
+  //Grab NCBI counts to see what's going on if we don't have a CSV file
+  $.get( "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&rettype=count&term=" + term, function( data ) {
+    var totalCount = data.esearchresult.count;
+    var tryagainURL = 'https://www.ncbi.nlm.nih.gov/pubmed/?term=' + term;
+    if (totalCount == 0) {
+      console.log("nothing!");
+      $("#noJoymsg").append('Nothing was found for this search. Try something else above or see if you can <a href="' + tryagainURL + '">refine your strategy on PubMed</a>');
+    } else {
+      $("#noJoymsg").append('Your search only retrieved <strong>' + totalCount + '</strong> results. PubMed by Year can only graph searches that have at least 500 results in total.');
+      $("#noJoymsg").append('Try something else above or see if you can <a href="' + tryagainURL + '">refine your strategy on PubMed</a>');
+    }
+  })
+  .fail(function() {
+    alert( "There was some sort of problem -- please reload the page" );
+  });
+}
 
 $("#runsearch").click(function(){
     handlesearch();
