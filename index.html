@@ -78,6 +78,7 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 <div id="results">
 <div id="splash" class="panel panel-default splash">
   <div class="panel-body">
+
     <p>PubMed by Year shows your search proportionally, comparing the results for each year to the database as whole.</p>
     <p>Enter any <a href="https://www.ncbi.nlm.nih.gov/pubmed/">PubMed</a> search above to see how your results change over time.
     You can use one word (e.g. <a class="example" data-srchstr="q1=heart">heart</a>, <a class="example" data-srchstr="q1=diabetes">diabetes</a>) or
@@ -166,6 +167,20 @@ Designed and built by Ed Sperr (esperr@uga.edu or ed_sperr@hotmail.com)
 <script>
 
 (function() {
+// Detecting old IE
+var ua = window.navigator.userAgent;
+var msie = ua.indexOf("MSIE ");
+if (msie > 0) // If Internet Explorer, return version number
+{
+    var ieVer = parseInt(ua.substring(msie + 5, ua.indexOf(".", msie)));
+    if (ieVer < 9) {
+      $("#search").empty();
+      $("#search").append('<div class="alert alert-warning alert-danger" role="alert">');
+      $("#search .alert").append('<h4>Sorry!&nbsp;Your browser is not supported</h4>');
+      $("#search .alert").append("<p>PubMed by Year uses jQuery and Material Charts. A browser that supports these applications (e.g. IE9 or above) is required.</p>");
+    };
+}
+
 
 var searches = { counts:{}, searchterms:[] };
 var dataURL = "";
@@ -209,7 +224,6 @@ $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
 
 //var search = [];
 google.charts.load('current', {'packages':['line']});
-//google.charts.load('current', {packages: ['corechart', 'line']});
 
 
 var currentwidth = $("#left").innerWidth() * .9;
