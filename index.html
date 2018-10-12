@@ -39,9 +39,12 @@ if (msie > 0) {
     }
 }
 </script>
-<script type="text/javascript" src="https://canvg.github.io/canvg/rgbcolor.js"></script>
-<script type="text/javascript" src="https://canvg.github.io/canvg/StackBlur.js"></script>
-<script type="text/javascript" src="https://canvg.github.io/canvg/canvg.js"></script>
+<!-- Required to convert named colors to RGB -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/canvg/1.4/rgbcolor.min.js"></script>
+<!-- Optional if you want blur -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stackblur-canvas/1.4.1/stackblur.min.js"></script>
+<!-- Main canvg code -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/canvg/dist/browser/canvg.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -372,6 +375,7 @@ function dosearch(term) {
       //'alert("Nothing found for this search or too few results to chart by year. Please try again");
       $('#noJoy').on('closed.bs.alert', function () {
         if (searches.searchterms.length > 0) {
+          console.log(JSON.stringify(searches))
             drawMainChart();
         } else {
           return;
