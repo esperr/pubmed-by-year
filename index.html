@@ -472,7 +472,7 @@ function drawMainChart() {
       var term = searches.searchterms[i];
       var yearTotal = Number(searches.counts[year]["total"]);
       if (searches.counts[year][term]) {
-        var proportion = Number(searches.counts[year][term]) / yearTotal;
+        var proportion = (Number(searches.counts[year][term]) / yearTotal) * 100000;
         construct = {
           v: proportion,
           f: Number(searches.counts[year][term]).toLocaleString() + " citations (out of " + yearTotal.toLocaleString() + " in " + year + ")"
@@ -492,13 +492,13 @@ function drawMainChart() {
 
   options = {
         chart: {
-          title: 'Proportion of citations in PubMed',
+          title: 'Results per 100,000 citations in PubMed',
           subtitle: 'proportion for each search by year, ' + $("[name=startyear]").val() + ' to ' + $("[name=endyear]").val()
         },
         width: mywidth,
         height: myheight,
         vAxis: {format: 'decimal',
-                title: 'proportion'},
+                title: 'results per 100,000'},
       };
 
   var chart = new google.charts.Line(document.getElementById('chart_div'));
