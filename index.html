@@ -199,15 +199,6 @@ var printsize = "small";
 
 var currentLocation = location.hostname + location.pathname;
 
-//Do we have a search or datespan specified in the querystring?
-if (location.search) {
-  var queryDict = {};
-  location.search.substr(1).split("&").forEach(function(item) {
-      queryDict[item.split("=")[0]] = item.split("=")[1]
-  })
-  querySearch(queryDict);
-}
-
 
 //Fetch our baseline counts from the webservice
 $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
@@ -217,6 +208,20 @@ $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
     searches.counts[year] = { "total": allCounts[year] } ;
   }
   pickYears();
+  if (location.search) {
+    var queryDict = {};
+    location.search.substr(1).split("&").forEach(function(item) {
+        queryDict[item.split("=")[0]] = item.split("=")[1]
+    })
+    if (queryDict["startyear"]) { startYear = queryDict["startyear"]; }
+    if (queryDict["endyear"]) { endYear = queryDict["endyear"]; }
+    for (var search in queryDict) {
+      if(search.match(/q/)) {
+        term = decodeURIComponent(queryDict[search])
+        dosearch(term);
+      }
+    }
+  }
 })
 .fail(function() {
   alert( "There was some sort of problem -- please reload the page" );
@@ -239,16 +244,7 @@ if (currentwidth > mywidth) {
 //dosearch(term);
 //alert("done!");
 
-function querySearch(queryDict) {
-  if (queryDict["startyear"]) { startYear = queryDict["startyear"]; }
-  if (queryDict["endyear"]) { endYear = queryDict["endyear"]; }
-  for (var search in queryDict) {
-    if(search.match(/q/)) {
-      term = decodeURIComponent(queryDict[search])
-      dosearch(term);
-    }
-  }
-}
+//Do we have a search or datespan specified in the querystring?
 
 function handlesearch() {
   term = $("#pmsearch").val();
