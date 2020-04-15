@@ -187,10 +187,11 @@ var dataURL = "";
 var basecounts = {};
 
 var d = new Date();
-var thisYear = d.getFullYear();
+//What was the year 30 days ago?
+d.setDate(d.getDate()-30);
+var endYear = d.getFullYear();
 
 var startYear = 1945;
-var endYear = thisYear-1;
 
 var data;
 var options;
@@ -514,7 +515,9 @@ function drawMainChart() {
 
   google.visualization.events.addListener(chart, 'select', selectHandler);
   chart.draw(data,  google.charts.Line.convertOptions(options));
-
+  //Enable download of CSV file?
+  //var csv = google.visualization.dataTableToCsv(data);
+  //console.log(csv);
   $("#chart_div").append('<a href="#!" class="printMe">Printable version</a>');
   $("#chart_div").append('<p>Share this search: <a href="#!" class="shareLink">Link</a></p>');
 
