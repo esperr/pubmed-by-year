@@ -201,7 +201,6 @@ var printsize = "small";
 
 var currentLocation = location.hostname + location.pathname;
 
-
 //Fetch our baseline counts from the webservice
 $.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
   //build out our data structure
@@ -353,7 +352,7 @@ $( "#results" ).on( "click", ".shareLink", function() {
 
 function dosearch(term) {
   showWait();
-  urlstem = "https://med-by-year.appspot.com/search?q=";
+  urlstem = "https://med-by-year.appspot.com/newsearch?q=";
   url = urlstem + encodeURIComponent(term);
   $.get( url, function( data ) {
     if (data.hasOwnProperty('counts')) {
