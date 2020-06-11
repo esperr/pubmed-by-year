@@ -11,6 +11,9 @@ body {
   margin-bottom: 60px;
   }
 
+p {
+  font-size: 110%;
+}
   .footer {
   position: absolute;
   bottom: 0;
@@ -48,6 +51,12 @@ body {
     border-radius: 10px;
     margin-bottom: 2em;
     padding: 2em;
+  }
+
+#bug {
+  padding: 1em;
+  margin-top: 1.5em;
+  width: 30%
   }
 
 .hideme { display: none; }

@@ -93,16 +93,16 @@ if (msie > 0) {
 <div id="splash" class="panel panel-default splash">
   <div class="panel-body">
 
-    <p>PubMed by Year shows your search proportionally, comparing the results for each year to the database as whole.</p>
-    <p>Enter any <a href="https://www.ncbi.nlm.nih.gov/pubmed/">PubMed</a> search above to see how your results change over time.
-    You can use one word (e.g. <a class="example" data-srchstr="q1=heart">heart</a>, <a class="example" data-srchstr="q1=diabetes">diabetes</a>) or
-    several (<a class="example" data-srchstr="q1=breast cancer">breast cancer</a>, <a class="example" data-srchstr="q1=myocardial infarction">myocardial infarction</a>).
-    You can even use more advanced techniques such as field tags (<a class="example" data-srchstr="Leukemia[Mesh]">Leukemia[Mesh]</a>, <a class="example" data-srchstr="q1=pubmednotmedline [sb]">pubmednotmedline [sb]</a>) or
-    boolean operators (<a class="example" data-srchstr="q1=smoking AND lung cancer ">smoking AND lung cancer</a>, <a class="example" data-srchstr="q1=polio AND (vaccine OR vaccination)">polio AND (vaccine OR vaccination)</a>).
-    Finally, by entering multiple searches one at a time, you can easily <a class="example" data-srchstr="q1=dengue&q2=chikungunya&q3=zika">compare</a> them.
-    Once you're finished, you can easily share your results with others or save your graphs for later.
+    <p>Enter any <a href="https://www.ncbi.nlm.nih.gov/pubmed/">PubMed</a> search above to see how your results change over time. PubMed by Year shows your search <em>proportionally</em>, allowing you to discover publication trends by comparing results for each year to the database as whole.</p>
+    <p>You can use one word (e.g. <code><a class="example" data-srchstr="q1=heart">heart</a>, <a class="example" data-srchstr="q1=diabetes">diabetes</a></code>) or
+    several (<code><a class="example" data-srchstr="q1=breast cancer">breast cancer</a>, <a class="example" data-srchstr="q1=myocardial infarction">myocardial infarction</a></code>).</p>
+    <p>You can even use more advanced techniques such as field tags (<code><a class="example" data-srchstr="Leukemia[Mesh]">Leukemia[Mesh]</a>, <a class="example" data-srchstr="q1=pubmednotmedline [sb]">pubmednotmedline [sb]</a></code>) or
+    boolean operators (<code><a class="example" data-srchstr="q1=smoking AND lung cancer ">smoking AND lung cancer</a>, <a class="example" data-srchstr="q1=polio AND (vaccine OR vaccination)">polio AND (vaccine OR vaccination)</a></code>).</p>
 
-      <em><a href="about.html">(more)</a></em></p>
+    <p>Finally, by entering multiple searches one at a time, you can <code><a class="example" data-srchstr="q1=dengue&q2=chikungunya&q3=zika">compare</a></code> them directly to one another.
+    Once you're finished, you can easily share your results with others by sending them a link to your search or by saving your graphs (or CSV data) for later.</p>
+
+      <em><a href="about.html">(more details)</a></em></p>
     </div>
 </div>
 </div>
@@ -418,6 +418,7 @@ $("#runsearch").click(function(){
 
 
 function drawMainChart() {
+  var CSVvalues = [];
   $("#results").empty();
   showDone();
   if (startYear < 1945) {
@@ -455,16 +456,20 @@ function drawMainChart() {
   $( "#sharingUrlcontent" ).attr( "value", shareUrl );
 
   data = new google.visualization.DataTable();
+  var CSVlabels = [];
   data.addColumn('string', 'Year');
+  CSVlabels[0] = "Year";
   for (i = 0; i < searches.searchterms.length; i++) {
     data.addColumn('number', searches.searchterms[i]);
+    CSVlabels[i+1] = searches.searchterms[i];
   }
-
+  CSVvalues.push(CSVlabels);
 
   for (var year in searches.counts) {
     if (Number(year) < startYear) { continue; }
     if (Number(year) > endYear) { continue; }
     theseCounts = [year];
+    var CSVcounts = [year];
     for (i = 0; i < searches.searchterms.length; i++) {
       var term = searches.searchterms[i];
       var yearTotal = Number(searches.counts[year]["total"]);
@@ -475,12 +480,15 @@ function drawMainChart() {
           f: Number(searches.counts[year][term]).toLocaleString() + " citations (out of " + yearTotal.toLocaleString() + " in " + year + ")"
         }
         theseCounts.push(construct);
+        CSVcounts[i+1] = proportion;
         //theseCounts.push(proportion);
       } else {
         theseCounts.push(0);
+        CSVcounts[i+1] = 0;
       }
     }
     data.addRow(theseCounts);
+    CSVvalues.push(CSVcounts);
   }
   //we clear the address bar...
   var ourLocation = location.pathname + "?" + myQuerystring;
@@ -515,11 +523,27 @@ function drawMainChart() {
 
   google.visualization.events.addListener(chart, 'select', selectHandler);
   chart.draw(data,  google.charts.Line.convertOptions(options));
-  //Enable download of CSV file?
-  //var csv = google.visualization.dataTableToCsv(data);
-  //console.log(csv);
-  $("#chart_div").append('<a href="#!" class="printMe">Printable version</a>');
-  $("#chart_div").append('<p>Share this search: <a href="#!" class="shareLink">Link</a></p>');
+  google.visualization.events.addListener(chart, 'ready', downloadHandler);
+  var CSVtext = "";
+  for (i=0;i<CSVvalues.length;i++) {
+    CSVtext += CSVvalues[i].toString() + '\n';
+  }
+  var CSVdata = 'data:text/csv;charset=utf-8,' + encodeURI(CSVtext);
+
+
+  function downloadHandler() {
+    var t = $("#chart_div svg")[0];
+    var xmlString = (new XMLSerializer).serializeToString(t);
+    var dataLink = "data:image/svg+xml," + encodeURIComponent(xmlString);
+
+    $("#svgdownload").attr("href", dataLink);
+    $("#csvdownload").attr("href", CSVdata);
+  }
+
+  $("#chart_div").append('<div id="bug" class="panel panel-default">');
+  $("#chart_div #bug").append('<a href="#!" class="printMe">Printable version</a><br />');
+  $("#chart_div #bug").append('Download: <a href="" id="csvdownload" download="PubMed by Year.csv">CSV data</a> | <a href="" id="svgdownload" download="PubMed by Year.svg">SVG for chart</a><br />');
+  $("#chart_div #bug").append('Share this search: <a href="#!" class="shareLink">Link</a>');
 
   }
 
