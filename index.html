@@ -51,10 +51,13 @@ if (msie > 0) {
 
 <div class="container">
 
+
+
 <div id="topbanner" class="jumbotron">
   <h1>PubMed by Year</h1>
   <a id="about" class="label label-default" href="about.html">About PubMed by Year</a>
 </div>
+
 
 <div class="row">
 
@@ -168,6 +171,17 @@ if (msie > 0) {
 </div>
 </div>
 -->
+
+
+<!-- START Bootstrap-Cookie-Alert
+<div class="alert text-center cookiealert" role="alert">
+    <b>Do you like cookies?</b> &#x1F36A; We use cookies to ensure you get the best experience on our website. <a href="https://cookiesandyou.com/" target="_blank">Learn more</a>
+
+    <button type="button" class="btn btn-primary btn-sm acceptcookies">
+        I agree
+    </button>
+</div>
+END Bootstrap-Cookie-Alert -->
 
 <footer class="footer">
   <div class="container">
@@ -451,7 +465,7 @@ function drawMainChart() {
     myQuerystring = myQuerystring + "&endyear=" + endYear;
     //queryDict["endyear"] = endYear;
   }
-  var shareUrl = currentLocation + "?" +  myQuerystring;
+  var shareUrl = currentLocation + "?" +  encodeURI(myQuerystring);
   $( "#sharingUrlcontent" ).attr( "style", "width: 35em;" );
   $( "#sharingUrlcontent" ).attr( "value", shareUrl );
 
@@ -629,6 +643,13 @@ function keysrt(arr, key, reverse) {
     });
 }
 
+$(".cookiealert").click(function(){
+  cookiemonster();
+      });
+
+function cookiemonster() {
+  $( ".cookiealert" ).hide();
+}
 })
 
 ();

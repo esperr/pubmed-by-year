@@ -174,3 +174,15 @@ p {
 .splash {
   max-width: 55em;
 }
+
+.cookiealert {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    margin: 0 !important;
+    z-index: 999;
+    border-radius: 0;
+    background-color: rgba(255, 255, 128, .6);;
+  
+  }
