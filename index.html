@@ -137,7 +137,7 @@ if (msie > 0) {
         <input type="text" id="sharingUrlcontent">
       </div>
       <div class="modal-footer">
-        <p>Copy the link above</p>
+        <button type="button" class="copyme">Copy link to clipbaord</button>
       </div>
     </div>
   </div>
@@ -465,7 +465,7 @@ function drawMainChart() {
     myQuerystring = myQuerystring + "&endyear=" + endYear;
     //queryDict["endyear"] = endYear;
   }
-  var shareUrl = currentLocation + "?" +  encodeURI(myQuerystring);
+  var shareUrl = "https://" + currentLocation + "?" +  encodeURI(myQuerystring);
   $( "#sharingUrlcontent" ).attr( "style", "width: 35em;" );
   $( "#sharingUrlcontent" ).attr( "value", shareUrl );
 
@@ -650,6 +650,12 @@ $(".cookiealert").click(function(){
 function cookiemonster() {
   $( ".cookiealert" ).hide();
 }
+
+$(".copyme").click(function(){
+  let myLink = document.getElementById("sharingUrlcontent").value;
+  navigator.clipboard.writeText(myLink);
+  $("#sharing-link").modal('hide');
+      });
 })
 
 ();
