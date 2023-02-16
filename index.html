@@ -137,7 +137,7 @@ if (msie > 0) {
         <input type="text" id="sharingUrlcontent">
       </div>
       <div class="modal-footer">
-        <button type="button" class="copyme">Copy link to clipbaord</button>
+        <button type="button" class="copyme">Copy link to clipboard</button>
       </div>
     </div>
   </div>
@@ -465,7 +465,7 @@ function drawMainChart() {
     myQuerystring = myQuerystring + "&endyear=" + endYear;
     //queryDict["endyear"] = endYear;
   }
-  var shareUrl = "https://" + currentLocation + "?" +  encodeURI(myQuerystring);
+  var shareUrl = "https://" + currentLocation + "?" +  pastyString(myQuerystring);
   $( "#sharingUrlcontent" ).attr( "style", "width: 35em;" );
   $( "#sharingUrlcontent" ).attr( "value", shareUrl );
 
@@ -603,14 +603,14 @@ function drawMainChart() {
       ctx.fill();
       ctx.font="13px Roboto";
       ctx.fillStyle = "Gray";
-      ctx.fillText("Made with PubMed by Year: http://esperr.github.io/pubmed-by-year",0,height + 25);
+      ctx.fillText("Made with PubMed by Year: http://esperr.github.io/pubmed-by-year",25,height);
 
       //var can = document.getElementById('canvas');
       var can3 = document.getElementById('canvas');
       var ctx3 = can3.getContext('2d');
 
       ctx3.drawImage(c2, 0, 0);
-      ctx3.drawImage(canvchart, 0, 0);
+      ctx3.drawImage(canvchart, 25, 25, width-50, height-50);
       var newdataURL = c2.toDataURL();
       $("#chart_two").addClass( "hideme" );
       $('#printchart').modal();
@@ -641,6 +641,14 @@ function keysrt(arr, key, reverse) {
 
         return sortOrder * ((x < y) ? -1 : ((x > y) ? 1 : 0));
     });
+}
+
+function pastyString(str) {
+  let pastableStr = encodeURI(str);
+  pastableStr = pastableStr.replace(/\(/g, "%28");
+  pastableStr = pastableStr.replace(/\)/g, "%29");
+  pastableStr = pastableStr.replace(/\//g, "%2F");
+  return pastableStr;
 }
 
 $(".cookiealert").click(function(){
