@@ -216,12 +216,14 @@ var printsize = "small";
 var currentLocation = location.hostname + location.pathname;
 
 //Fetch our baseline counts from the webservice
-$.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
+$.get( "https://med-by-year.appspot.com/newsearch?q=all%5Bsb%5D", function( data ) {
   //build out our data structure
   var allCounts = data.counts;
   for (var year in allCounts) {
     searches.counts[year] = { "total": allCounts[year] } ;
   }
+})
+.done(function() {
   pickYears();
   if (location.search) {
     var queryDict = {};
