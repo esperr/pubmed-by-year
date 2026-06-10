@@ -214,9 +214,10 @@ var options;
 var printsize = "small";
 
 var currentLocation = location.hostname + location.pathname;
+var retryCount = 0;
 
 //Fetch our baseline counts from the webservice
-$.get( "https://med-by-year.appspot.com/newsearch?q=all%5Bsb%5D", function( data ) {
+$.get( "https://med-by-year.appspot.com/showbasecounts", function( data ) {
   //build out our data structure
   var allCounts = data.counts;
   for (var year in allCounts) {
@@ -379,16 +380,25 @@ function dosearch(term) {
       }
       drawMainChart();
     } else {
+      console.log(retryCount);
+      retryCount = retryCount + 1;
+      if (retryCount < 3) { 
+        setTimeout(dosearch, 500, term);
+        return;
+      }
       showDone();
-      getTotals(term);
+      //PMCounts = getPMCount(term);
+      //console.log(PMCounts);
       $("#results").append('<div id="noJoy" class="alert alert-warning alert-danger" role="alert">');
       $("#results .alert").append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
       $("#results .alert").append('<h4>Sorry!&nbsp;</h4>');
-      $("#results .alert").append("<p><div id=noJoymsg></div></p>");
+      $("#results .alert").append("<div id=noJoymsg></div>");
+      var tryagainURL = 'https://www.ncbi.nlm.nih.gov/pubmed/?term=' + term;
+      $("#noJoymsg").append('<p>Nothing was found for this search. Try something else above or see if you can <a href="' + tryagainURL + '">refine your strategy on PubMed</a></p>. <p>Contact <a href="mailto:ed_sperr@hotmail.com">ed_sperr@hotmail.com</a> for further assistance.</p>');
       //'alert("Nothing found for this search or too few results to chart by year. Please try again");
       $('#noJoy').on('closed.bs.alert', function () {
         if (searches.searchterms.length > 0) {
-          console.log(JSON.stringify(searches))
+          //console.log(JSON.stringify(searches))
             drawMainChart();
         } else {
           return;
